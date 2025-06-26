@@ -6,15 +6,17 @@
 #include <string>
 #include <fstream>
 
-struct Record {
-    int attempts;
-    int target;
-    bool success;
-    int start, end;
-};
+
 
 class ScoreManager {
 public:
+    struct Record {
+        int attempts;
+        int target;
+        bool success;
+        int start, end;
+    };
+
     ScoreManager() {
         loadHistoryFromFile();
     }
@@ -66,7 +68,7 @@ public:
     }
 private:
     std::vector<Record> history;
-    std::string filename = "history.txt";
+    const std::string filename = "history.txt";
 };
 
 #endif // SCOREMANAGER_H

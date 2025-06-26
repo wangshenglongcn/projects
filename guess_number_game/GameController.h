@@ -34,7 +34,7 @@ public:
             if (quit) break;
             std::cout << "Do you want to continue? (y/n): ";
             std::cin >> again;
-            std::cin.ignore(1000, '\n');
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
         } while (again == 'y' || again == 'Y');
 
         std::cout << "Thanks for playing!\n";
@@ -58,12 +58,12 @@ private:
         while (true) {
             std::cout << "Enter choice (1-4): ";
             if (std::cin >> choice && choice >= 1 && choice <= 4) {
-                std::cin.ignore(1000, '\n');
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
                 return choice;
             }
             std::cout << "Invalid input. Try again.\n";
             std::cin.clear();
-            std::cin.ignore(1000, '\n');
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
         }
     }
 
@@ -72,15 +72,15 @@ private:
         while (!(std::cin >> start)) {
             std::cout << "Invalid input. Please enter an integer: ";
             std::cin.clear();
-            std::cin.ignore(1000, '\n');
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
         }
         std::cout << "Enter end of range: ";
         while (!(std::cin >> end) || end < start) {
             std::cout << "Invalid input. Enter an integer >= start: ";
             std::cin.clear();
-            std::cin.ignore(1000, '\n');
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
         }
-        std::cin.ignore(1000, '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
     }
 
     void playGame() {
@@ -95,7 +95,7 @@ private:
             if (!(std::cin >> guess)) {
                 std::cout << "Please enter a valid number.\n";
                 std::cin.clear();
-                std::cin.ignore(1000, '\n');
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
                 continue;
             }
             attempts++;
@@ -115,7 +115,7 @@ private:
         }
 
         scores.addRecord(attempts, target, success, start, end);
-        std::cin.ignore(1000, '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
     }
 };
 
