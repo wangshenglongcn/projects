@@ -1,6 +1,7 @@
 import os
 import argparse
 
+
 def rename_files(dir, pre, suf, dry):
     if not os.path.isdir(dir):
         print(f"目录不存在{dir}")
@@ -19,7 +20,7 @@ def rename_files(dir, pre, suf, dry):
                     count += 1
                     continue
 
-                if (dry):
+                if dry:
                     print(f"[预览] {old_path} 将要修改为：{new_path}")
                 else:
                     # try-except捕获异常
