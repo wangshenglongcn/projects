@@ -1,3 +1,0 @@
-D:/tmp/projects/guess_number_game/build/CMakeFiles/guess_number_game.dir
-D:/tmp/projects/guess_number_game/build/CMakeFiles/edit_cache.dir
-D:/tmp/projects/guess_number_game/build/CMakeFiles/rebuild_cache.dir
