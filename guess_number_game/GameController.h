@@ -5,10 +5,13 @@
 #include "RandomGenerator.h"
 #include "ScoreManager.h"
 
+// 游戏主控制器类，负责主逻辑循环、菜单显示、输入处理等
 class GameController {
 public:
+    // 构造函数，初始化猜数字的范围，默认1~100
     GameController() : start(1), end(100) {}
 
+    // 启动游戏主循环，用do-while实现能够先进行操作，然后可以选择是否重复游玩
     void run() {
         char again;
         do {
@@ -17,16 +20,16 @@ public:
             bool quit = false;
             switch (choice) {
                 case 1:
-                    playGame();
+                    playGame();  // 开始游戏
                     break;
                 case 2:
-                    setRange();
+                    setRange();  // 设置范围
                     break;
                 case 3:
-                    scores.printHistory();
+                    scores.printHistory();  // 打印历史成绩
                     break;
                 case 4:
-                    quit = true;
+                    quit = true;  // 退出
                     break;
                 default:
                     std::cout << "Invalid choice, try again.\n";
@@ -34,6 +37,7 @@ public:
             if (quit) break;
             std::cout << "Do you want to continue? (y/n): ";
             std::cin >> again;
+            // 该行是去除整行多余的输入，避免污染后续的读取操作，用cin.ignore(1000, '\n')是去除1000个字符
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
         } while (again == 'y' || again == 'Y');
 
@@ -41,10 +45,11 @@ public:
     }
 
 private:
-    RandomGenerator randomGen;
-    ScoreManager scores;
-    int start, end;
+    RandomGenerator randomGen;  // 随机数生成器
+    ScoreManager scores;  // 分数管理器
+    int start, end;  // 记录当前游戏数字范围
 
+    // const保证不会修改成员变量，使得const对象可以调用该函数，如const GameController controller; controller.showMenu();
     void showMenu() const {
         std::cout << "=== Guess Number Game ===\n"
                   << "1. Start Game\n"
@@ -53,6 +58,7 @@ private:
                   << "4. Quit\n";
     }
 
+    // 获取用户的菜单选项（带输入验证）
     int getChoice() {
         int choice;
         while (true) {
@@ -67,6 +73,7 @@ private:
         }
     }
 
+    // 设置用户自定义的猜数范围
     void setRange() {
         std::cout << "Enter start of range: ";
         while (!(std::cin >> start)) {
@@ -83,8 +90,9 @@ private:
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
     }
 
+    // 主游戏逻辑：最多 10 次猜数机会
     void playGame() {
-        int target = randomGen.getRandom(start, end);
+        int target = randomGen.getRandom(start, end);  // 生成随机数
         std::cout << "I'm thinking of a number between " << start << " and " << end << ".\n";
 
         int attempts = 0, guess;
@@ -114,6 +122,7 @@ private:
             std::cout << "You failed. The number was: " << target << "\n";
         }
 
+        // 保存历史记录
         scores.addRecord(attempts, target, success, start, end);
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');;
     }
