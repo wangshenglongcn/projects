@@ -1,6 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 """
 1. 豆瓣一部分结构如下
@@ -97,8 +98,11 @@ def fetch_page_data(url, page):
 if __name__ == "__main__":
     url = "https://movie.douban.com/top250"
     output = "douban250.json"
-    info = []
-    for i in range(10):
-        info += fetch_page_data(url, i)
 
-    write_to_json(info, output)
+    movie_info = []
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(fetch_page_data, url, i) for i in range(10)]
+        for future in futures:
+            movie_info += future.result()
+
+    write_to_json(movie_info, output)
