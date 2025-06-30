@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -76,17 +77,42 @@ func saveToCSV(movies []Movie) {
 func main() {
 	alls := []Movie{}
 	baseUrl := "https://movie.douban.com/top250"
+
+	var wg sync.WaitGroup             // 计数器，在goroutine启动时+1，完成后-1
+	taskChan := make(chan string, 10) // 运输通道，这里是运送string类型的通道
+
+	// 消费者，只管怎么处理，不管任务分发
+	for i := 0; i < 3; i++ {
+		wg.Add(1) // 表示即将开启一个新的goroutine
+
+		// 这里的id只供打印参考，不会对并发有任何影响
+		// 实际开启一个新的goroutine
+		go func() {
+			defer wg.Done() // wg.Done() 表示当前goroutine完成，计数器 - 1，defer将该操作推迟至函数末尾
+			// 这里range等价于 <- taskChan，将taskChan头部元素传递给url
+			for url := range taskChan {
+				fmt.Println("抓取：", url)
+				movies, err := fetchPage(url)
+				if err != nil {
+					fmt.Println(url, " 抓取失败：", err)
+					continue
+				}
+				alls = append(alls, movies...)
+			}
+		}()
+	}
+
+	// 生产者，将url传给taskChan，然后消费者从taskChan队头取出元素开始消费
 	for start := 0; start < 250; start += 25 {
 		url := fmt.Sprintf("%s?start=%d", baseUrl, start)
-		//
-		movies, err := fetchPage(url)
-		if err != nil {
-			fmt.Println("抓取失败：", err)
-			continue
-		}
-		alls = append(alls, movies...)
+		taskChan <- url
 		time.Sleep(2 * time.Second)
 	}
+
+	// channel 被关闭后，里面“已有的任务”仍然可以被消费，直到 channel 彻底空了
+	// 所以任务分发完毕后要立马关闭taskChan，不关闭的话 range taskChan会一直堵塞，永远无法退出
+	close(taskChan)
+	wg.Wait() // 等待所有 goroutine 执行完成
 
 	saveToCSV(alls)
 	fmt.Println("结果已保存到 douban_top250.csv")
