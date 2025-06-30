@@ -75,11 +75,11 @@ func saveToCSV(movies []Movie) {
 }
 
 func main() {
-	alls := []Movie{}
 	baseUrl := "https://movie.douban.com/top250"
 
 	var wg sync.WaitGroup             // 计数器，在goroutine启动时+1，完成后-1
 	taskChan := make(chan string, 10) // 运输通道，这里是运送string类型的通道
+	resultChan := make(chan []Movie, 10)
 
 	// 消费者，只管怎么处理，不管任务分发
 	for i := 0; i < 3; i++ {
@@ -97,7 +97,7 @@ func main() {
 					fmt.Println(url, " 抓取失败：", err)
 					continue
 				}
-				alls = append(alls, movies...)
+				resultChan <- movies
 			}
 		}()
 	}
@@ -113,7 +113,14 @@ func main() {
 	// 所以任务分发完毕后要立马关闭taskChan，不关闭的话 range taskChan会一直堵塞，永远无法退出
 	close(taskChan)
 	wg.Wait() // 等待所有 goroutine 执行完成
+	close(resultChan)
 
-	saveToCSV(alls)
+	// 新开一个chan确保并发结果安全
+	allMovies := []Movie{}
+	for movies := range resultChan {
+		allMovies = append(allMovies, movies...)
+	}
+
+	saveToCSV(allMovies)
 	fmt.Println("结果已保存到 douban_top250.csv")
 }
