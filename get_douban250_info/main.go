@@ -44,7 +44,7 @@ func fetchPage(url string) ([]Movie, error) {
 	doc.Find(".grid_view .item").Each(func(i int, s *goquery.Selection) {
 		title := s.Find(".title").First().Text()
 		rating := s.Find(".rating_num").Text()
-		link, _ := s.Find(".hd a").Attr("href")
+		link, _ := s.Find(".hd a").Attr("href") // Attr返回的第二个参数是是否存在这个属性，不存在则link为空
 
 		movies = append(movies, Movie{
 			Name:   title,
@@ -66,9 +66,9 @@ func saveToCSV(movies []Movie) {
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
-	defer writer.Flush()
+	defer writer.Flush() // 注意，通过writer.Writer写入的数据是存储在缓冲区的，执行Flush才能写入到文件
 
-	writer.Write([]string{"标题", "评分", "链接"})
+	writer.Write([]string{"标题", "评分", "链接"}) // Writer需要参数是字符串数组
 	for _, m := range movies {
 		writer.Write([]string{m.Name, m.Rating, m.Url})
 	}
